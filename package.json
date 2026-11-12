@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "description": "A chat agent with one tool, web search, and a memory of what it claimed and when.",
+  "author": "Amit Kumar Yadav",
   "type": "module",
   "engines": {
     "node": ">=22.13"
