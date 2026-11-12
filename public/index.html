@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Tally</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <script type="module" src="/app.js"></script>
+  </head>
+  <body>
+    <div class="app" id="app">
+      <aside class="sidebar" aria-label="Conversations">
+        <div class="sidebar-head">
+          <span class="brand">Tally</span>
+          <button type="button" id="new-chat" class="new-chat">+ New chat</button>
+        </div>
+        <ul id="conversations" class="conversations"></ul>
+      </aside>
+      <div class="scrim" id="scrim"></div>
+
+      <main class="chat">
+        <header class="topbar">
+          <button type="button" id="toggle-sidebar" class="icon-button" aria-label="Show conversations">☰</button>
+          <h1 id="title">New chat</h1>
+        </header>
+
+        <section id="messages" class="messages" aria-live="polite">
+          <div class="empty" id="empty">
+            <h2>Ask about anything current.</h2>
+            <p>I search the web when it matters, and I remember what I told you and when.</p>
+          </div>
+        </section>
+
+        <footer class="composer-area">
+          <div id="status" class="status" role="status" hidden></div>
+          <form id="composer" class="composer">
+            <textarea id="input" rows="1" placeholder="Message Tally…" aria-label="Message" autofocus></textarea>
+            <button type="submit" id="send" class="send">Send</button>
+          </form>
+        </footer>
+      </main>
+    </div>
+  </body>
+</html>

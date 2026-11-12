@@ -1,0 +1,287 @@
+{
+  "notes": [
+    "Each case starts with an empty database and runs its turns in order; the last turn is the one graded.",
+    "Every turn starts a new conversation unless it has \"continue\": true, so memory cases test recall across conversations.",
+    "\"at\" pins the server clock (NOW) for that turn: \"today\" (default, real clock), \"-9d\" (9 days ago), a weekday name (the most recent one before today), or an exact ISO instant.",
+    "\"{-9d}\" inside a message becomes that date as a person writes it, e.g. \"3 November\".",
+    "expect.search: true = must search, false = must not search, absent = either is fine. expect.rubric tells the judge what a correct answer looks like."
+  ],
+  "timeZone": "Asia/Kolkata",
+  "cases": [
+    {
+      "id": "lookup-single-price",
+      "category": "lookup",
+      "turns": [{ "message": "What does Neon's Launch plan cost right now?" }],
+      "expect": {
+        "search": true,
+        "rubric": "Gives a current price for Neon's Launch plan, cited. If that plan no longer exists under that name, says so and gives the closest current plan."
+      }
+    },
+    {
+      "id": "lookup-fan-out",
+      "category": "lookup",
+      "turns": [{ "message": "Compare Pipedrive, HubSpot Sales Hub and Close: per-seat pricing for a 20-person sales team." }],
+      "expect": {
+        "search": true,
+        "rubric": "Covers all three products with per-seat prices, each cited. A table or compact list is fine. Says so if a price could not be found rather than guessing."
+      }
+    },
+    {
+      "id": "lookup-version",
+      "category": "lookup",
+      "turns": [{ "message": "What is the latest LTS version of Node.js?" }],
+      "expect": { "search": true, "rubric": "Names a specific current LTS version, cited. Short." }
+    },
+    {
+      "id": "lookup-release-notes",
+      "category": "lookup",
+      "turns": [{ "message": "What did PostgreSQL ship in its most recent major release?" }],
+      "expect": { "search": true, "rubric": "Names the most recent major version and a few headline features, cited." }
+    },
+    {
+      "id": "lookup-availability",
+      "category": "lookup",
+      "turns": [{ "message": "Does Supabase still have a free tier, and what are its limits?" }],
+      "expect": { "search": true, "rubric": "Answers yes or no first, then the main limits, cited." }
+    },
+    {
+      "id": "followup-in-conversation",
+      "category": "lookup",
+      "turns": [
+        { "message": "What does Neon's Launch plan cost right now?" },
+        { "message": "And how does that compare with Supabase Pro?", "continue": true }
+      ],
+      "expect": {
+        "search": true,
+        "rubric": "Understands that \"that\" is the Neon Launch price from the previous turn and compares it with Supabase Pro's price, cited."
+      }
+    },
+
+    {
+      "id": "chat-greeting",
+      "category": "chat",
+      "turns": [{ "message": "hey there" }],
+      "expect": { "search": false, "rubric": "A short, friendly greeting. No facts, no sources." }
+    },
+    {
+      "id": "chat-thanks",
+      "category": "chat",
+      "turns": [{ "message": "thanks, that's really helpful!" }],
+      "expect": { "search": false, "rubric": "A short, natural acknowledgement. Does not pretend to remember what was helpful." }
+    },
+    {
+      "id": "chat-stable-knowledge",
+      "category": "chat",
+      "turns": [{ "message": "What's the difference between a process and a thread?" }],
+      "expect": { "search": false, "rubric": "A correct, compact explanation from general knowledge: separate memory vs shared memory, cost of switching. No citations needed." }
+    },
+    {
+      "id": "chat-maths",
+      "category": "chat",
+      "turns": [{ "message": "What is 17 times 23?" }],
+      "expect": { "search": false, "rubric": "Says 391. Very short." }
+    },
+    {
+      "id": "chat-capabilities",
+      "category": "chat",
+      "turns": [{ "message": "What can you help me with?" }],
+      "expect": { "search": false, "rubric": "Briefly says it can look up current information on the web and remember earlier conversations to check what changed. No invented history." }
+    },
+    {
+      "id": "clarify-ambiguous",
+      "category": "chat",
+      "turns": [{ "message": "Is it cheaper than the other one?" }],
+      "expect": {
+        "rubric": "Does not guess what \"it\" and \"the other one\" are. Asks at most one clarifying question and pairs it with an offer to proceed (for example, naming what it could compare)."
+      }
+    },
+
+    {
+      "id": "memory-recall-by-date",
+      "category": "multi-turn",
+      "turns": [
+        { "at": "-5d", "message": "What does Render charge for its cheapest managed Postgres instance?" },
+        { "message": "What did I ask you on {-5d}?" }
+      ],
+      "expect": {
+        "search": false,
+        "rubric": "Says the user asked about Render's cheapest managed Postgres price on that date, and gives the gist of the earlier answer. Adds no new web facts."
+      }
+    },
+    {
+      "id": "memory-recall-by-topic",
+      "category": "multi-turn",
+      "turns": [
+        { "at": "-6d", "message": "What does Fly.io charge for a shared-cpu-1x machine?" },
+        { "message": "What did you tell me about Fly.io pricing?" }
+      ],
+      "expect": { "rubric": "Recalls the earlier answer about the Fly.io shared-cpu-1x price and says when it was given (six days ago, or the date)." }
+    },
+    {
+      "id": "memory-yesterday",
+      "category": "multi-turn",
+      "turns": [
+        { "at": "-1d", "message": "Which is cheaper for a hobby project, Railway or Render?" },
+        { "message": "Yesterday I asked you to compare two hosts. Which ones were they, and what did you conclude?" }
+      ],
+      "expect": { "search": false, "rubric": "Names Railway and Render and restates yesterday's conclusion. Does not change the conclusion or add new facts." }
+    },
+    {
+      "id": "memory-then-verify",
+      "category": "multi-turn",
+      "turns": [
+        { "at": "-7d", "message": "What does Vercel's Pro plan cost per seat?" },
+        { "message": "A week ago you told me what Vercel Pro costs. Is that still right?" }
+      ],
+      "expect": {
+        "search": true,
+        "rubric": "Opens with a one-line verdict. Then, for the earlier price: the old value with its date next to the current value with a citation, marked unchanged, changed, or not verifiable. Never says unchanged without a current source."
+      }
+    },
+
+    {
+      "id": "miss-specific-date",
+      "category": "memory-miss",
+      "turns": [{ "message": "What did I ask you on {-9d}?" }],
+      "expect": {
+        "search": false,
+        "rubric": "Says plainly that it has no record of a conversation on that date. Invents nothing. Offers a useful next step."
+      }
+    },
+    {
+      "id": "miss-last-week",
+      "category": "memory-miss",
+      "turns": [{ "message": "What did we discuss last week?" }],
+      "expect": { "search": false, "rubric": "Says plainly that it has no record of any conversation last week. Invents nothing. Offers a next step." }
+    },
+    {
+      "id": "miss-verify-nothing",
+      "category": "memory-miss",
+      "turns": [{ "message": "Is the answer you gave me yesterday about Vercel pricing still correct?" }],
+      "expect": {
+        "rubric": "Says it has no record of that conversation, so it cannot say whether an earlier answer still holds. Offers to check Vercel pricing now, or does so with citations while making clear it is a fresh check, not a comparison."
+      }
+    },
+    {
+      "id": "miss-example-crm-shortlist",
+      "category": "memory-miss",
+      "turns": [
+        { "message": "On Monday we shortlisted 5 CRM tools for a 20-person sales team. Has any of them changed pricing or shipped something big since?" }
+      ],
+      "expect": {
+        "rubric": "Says it has no record of the Monday shortlist and does not present any list as remembered. Asks which five tools (one question at most) and offers to proceed, for example by checking the leading CRMs for a 20-person team."
+      }
+    },
+
+    {
+      "id": "edge-last-tuesday-on-a-tuesday",
+      "category": "date-edge",
+      "turns": [
+        { "at": "2026-11-03T09:00:00Z", "message": "What does Neon's Launch plan cost?" },
+        { "at": "2026-11-10T09:00:00Z", "message": "Last Tuesday I asked you about a database price. What was it, and what did you say?" }
+      ],
+      "expect": {
+        "search": false,
+        "rubric": "Today is Tuesday 10 November 2026. \"Last Tuesday\" is 3 November, a week earlier, not today. Recalls the Neon Launch plan question and its answer from Tuesday 3 November."
+      }
+    },
+    {
+      "id": "edge-midnight-ist-hit",
+      "category": "date-edge",
+      "turns": [
+        { "at": "2026-11-03T19:00:00Z", "message": "What does Supabase Pro cost per month?" },
+        { "at": "2026-11-10T09:00:00Z", "message": "What did I ask you on 4 November?" }
+      ],
+      "expect": {
+        "search": false,
+        "rubric": "The earlier question was sent at 00:30 on 4 November in India (still 3 November in UTC). Recalls the Supabase Pro question as asked on 4 November."
+      }
+    },
+    {
+      "id": "edge-midnight-ist-miss",
+      "category": "date-edge",
+      "turns": [
+        { "at": "2026-11-03T19:00:00Z", "message": "What does Supabase Pro cost per month?" },
+        { "at": "2026-11-10T09:00:00Z", "message": "What did I ask you on 3 November?" }
+      ],
+      "expect": {
+        "search": false,
+        "rubric": "In the user's timezone (India) the earlier question was asked on 4 November, not 3 November. Says it has no record for 3 November. It may add that there is a conversation from 4 November, but must not present it as asked on the 3rd."
+      }
+    },
+    {
+      "id": "edge-last-week-on-a-monday",
+      "category": "date-edge",
+      "turns": [
+        { "at": "2026-11-08T09:00:00Z", "message": "What does Railway's Hobby plan cost?" },
+        { "at": "2026-11-09T09:00:00Z", "message": "What did we talk about last week?" }
+      ],
+      "expect": {
+        "search": false,
+        "rubric": "Today is Monday 9 November 2026, so yesterday (Sunday 8 November) was already last week. Recalls the Railway Hobby plan question."
+      }
+    },
+    {
+      "id": "edge-new-york-evening",
+      "category": "date-edge",
+      "timeZone": "America/New_York",
+      "turns": [
+        { "at": "2026-11-04T03:00:00Z", "message": "What does Render's Starter web service cost?" },
+        { "at": "2026-11-10T15:00:00Z", "message": "What did I ask you on 3 November?" }
+      ],
+      "expect": {
+        "search": false,
+        "rubric": "The earlier question was sent at 10pm on 3 November in New York (already 4 November in UTC). Recalls the Render Starter question as asked on 3 November."
+      }
+    },
+    {
+      "id": "edge-ambiguous-last-tuesday",
+      "category": "date-edge",
+      "turns": [
+        { "at": "2026-11-03T09:00:00Z", "message": "What does Close CRM cost per seat?" },
+        { "at": "2026-11-13T09:00:00Z", "message": "Last Tuesday I asked you about a CRM price. Which CRM was it?" }
+      ],
+      "expect": {
+        "search": false,
+        "rubric": "Today is Friday 13 November 2026. Nothing was asked on Tuesday 10 November; the conversation was on Tuesday 3 November. Says it was Close, and states the actual date (3 November) rather than implying it was this week."
+      }
+    },
+
+    {
+      "id": "example-crm-since-monday",
+      "category": "example",
+      "turns": [
+        { "at": "monday", "message": "Shortlist 5 CRM tools for a 20-person sales team, with per-seat pricing." },
+        { "message": "On Monday we shortlisted 5 CRM tools for a 20-person sales team. Has any of them changed pricing or shipped something big since?" }
+      ],
+      "expect": {
+        "search": true,
+        "rubric": "Works from the five tools actually shortlisted on Monday. For each, reports a pricing change or notable release since Monday with a citation, or says there is no evidence of change. Keeps \"no evidence of change\" separate from \"confirmed unchanged\". Shows then next to now where something changed."
+      }
+    },
+    {
+      "id": "example-what-did-i-ask-on-date",
+      "category": "example",
+      "turns": [
+        { "at": "-9d", "message": "What does Neon's Launch plan cost, and what does Supabase Pro cost?" },
+        { "message": "What did I ask you on {-9d}? Is your answer still correct today?" }
+      ],
+      "expect": {
+        "search": true,
+        "rubric": "First says what was asked on that date (Neon Launch and Supabase Pro prices). Then a one-line verdict, and per price: the old value with its date next to the current value with a citation, marked unchanged, changed, or not verifiable."
+      }
+    },
+    {
+      "id": "example-postgres-last-tuesday",
+      "category": "example",
+      "turns": [
+        { "at": "tuesday", "message": "Which managed Postgres hosting is cheapest for a small production app? Compare Neon, Supabase and Render." },
+        { "message": "Last Tuesday I asked you about Postgres hosting. Has any pricing changed since then?" }
+      ],
+      "expect": {
+        "search": true,
+        "rubric": "Finds the Postgres hosting conversation from last Tuesday and states its date. Gives a one-line verdict, then per provider: the price then next to the price now with a citation, marked unchanged, changed, or not verifiable."
+      }
+    }
+  ]
+}

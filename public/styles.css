@@ -1,0 +1,446 @@
+:root {
+  --bg: #ffffff;
+  --panel: #f6f6f4;
+  --text: #1d1d1b;
+  --muted: #6b6b66;
+  --border: #e4e4df;
+  --accent: #2f5bd3;
+  --accent-text: #ffffff;
+  --user-bubble: #eef1f8;
+  --code-bg: #f2f2ef;
+  --danger: #b42318;
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #18181a;
+    --panel: #111113;
+    --text: #ececea;
+    --muted: #9a9a95;
+    --border: #2c2c30;
+    --accent: #7b9cff;
+    --accent-text: #0d1020;
+    --user-bubble: #23263a;
+    --code-bg: #232327;
+    --danger: #ff8a7a;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font: 15px/1.55 system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.app {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  height: 100dvh;
+}
+
+/* ---------- Sidebar ---------- */
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--panel);
+  border-right: 1px solid var(--border);
+}
+
+.sidebar-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 14px 12px;
+}
+
+.brand {
+  font-weight: 650;
+  letter-spacing: 0.01em;
+}
+
+.new-chat {
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+}
+
+.new-chat:hover {
+  border-color: var(--muted);
+}
+
+.conversations {
+  flex: 1;
+  overflow-y: auto;
+  margin: 0;
+  padding: 4px 8px 16px;
+  list-style: none;
+}
+
+.conversations button {
+  display: block;
+  width: 100%;
+  padding: 7px 10px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.conversations button:hover {
+  background: var(--border);
+}
+
+.conversations button.active {
+  background: var(--border);
+  font-weight: 550;
+}
+
+.scrim {
+  display: none;
+}
+
+/* ---------- Chat column ---------- */
+
+.chat {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.topbar h1 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.icon-button {
+  display: none;
+  padding: 2px 8px;
+  border: 0;
+  background: transparent;
+  font-size: 18px;
+}
+
+.messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px max(20px, calc((100% - 760px) / 2));
+}
+
+.empty {
+  margin-top: 18vh;
+  text-align: center;
+  color: var(--muted);
+}
+
+.empty h2 {
+  margin: 0 0 6px;
+  color: var(--text);
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.message {
+  margin: 0 0 20px;
+}
+
+.message.user {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.message.user .body {
+  max-width: 85%;
+  padding: 9px 14px;
+  border-radius: 14px;
+  background: var(--user-bubble);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* Typing indicator while waiting for the first token. */
+.message.pending .body::after {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--muted);
+  animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  50% {
+    opacity: 0.25;
+  }
+}
+
+/* ---------- Rendered markdown ---------- */
+
+.markdown {
+  overflow-wrap: anywhere;
+}
+
+.markdown > :first-child {
+  margin-top: 0;
+}
+
+.markdown > :last-child {
+  margin-bottom: 0;
+}
+
+.markdown p,
+.markdown ul,
+.markdown ol,
+.markdown pre,
+.markdown table,
+.markdown blockquote {
+  margin: 0 0 10px;
+}
+
+.markdown a {
+  color: var(--accent);
+}
+
+.markdown code {
+  padding: 1px 5px;
+  border-radius: 5px;
+  background: var(--code-bg);
+  font-size: 0.9em;
+}
+
+.markdown pre {
+  padding: 12px;
+  border-radius: 8px;
+  background: var(--code-bg);
+  overflow-x: auto;
+}
+
+.markdown pre code {
+  padding: 0;
+}
+
+.markdown table {
+  border-collapse: collapse;
+  display: block;
+  overflow-x: auto;
+}
+
+.markdown th,
+.markdown td {
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  text-align: left;
+}
+
+.markdown blockquote {
+  padding-left: 12px;
+  border-left: 3px solid var(--border);
+  color: var(--muted);
+}
+
+/* ---------- Sources and notes ---------- */
+
+.sources {
+  margin: 12px 0 0;
+  padding: 10px 12px 10px 32px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 13px;
+}
+
+.sources li + li {
+  margin-top: 4px;
+}
+
+.sources a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.sources a:hover {
+  text-decoration: underline;
+}
+
+.sources .host {
+  margin-left: 6px;
+  color: var(--muted);
+}
+
+.note {
+  margin: 8px 0 0;
+  font-size: 13px;
+}
+
+.note.muted {
+  color: var(--muted);
+}
+
+.note.error {
+  color: var(--danger);
+}
+
+/* ---------- Composer ---------- */
+
+.composer-area {
+  padding: 0 max(20px, calc((100% - 760px) / 2)) 18px;
+}
+
+.status {
+  padding: 0 4px 8px;
+  color: var(--muted);
+  font-size: 13px;
+  /* "Searching: a · b · c" can be long; one line keeps the layout still. */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.status::before {
+  content: '';
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  vertical-align: 1px;
+  animation: pulse 1s ease-in-out infinite;
+}
+
+.composer {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--bg);
+}
+
+.composer:focus-within {
+  border-color: var(--muted);
+}
+
+.composer textarea {
+  flex: 1;
+  min-height: 24px;
+  max-height: 200px;
+  padding: 6px 6px;
+  border: 0;
+  outline: none;
+  resize: none;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+}
+
+.send {
+  padding: 7px 14px;
+  border: 0;
+  border-radius: 9px;
+  background: var(--accent);
+  color: var(--accent-text);
+  font-weight: 550;
+}
+
+.send.stop {
+  background: var(--text);
+  color: var(--bg);
+}
+
+/* ---------- Narrow screens: sidebar becomes a drawer ---------- */
+
+@media (max-width: 760px) {
+  .app {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: 2;
+    width: min(280px, 85vw);
+    transform: translateX(-100%);
+    transition: transform 0.2s ease;
+  }
+
+  .sidebar-open .sidebar {
+    transform: none;
+  }
+
+  .sidebar-open .scrim {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    background: rgb(0 0 0 / 0.35);
+  }
+
+  .icon-button {
+    display: block;
+  }
+
+  .topbar,
+  .messages,
+  .composer-area {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}
+
+/* ---------- Inline citations ---------- */
+
+.cite {
+  margin-left: 1px;
+  font-size: 0.72em;
+  line-height: 0;
+}
+
+.cite a {
+  padding: 0 3px;
+  border-radius: 4px;
+  background: var(--code-bg);
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.cite a:hover {
+  text-decoration: underline;
+}

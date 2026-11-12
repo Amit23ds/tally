@@ -1,0 +1,34 @@
+{
+  "name": "tally",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A chat agent with one tool, web search, and a memory of what it claimed and when.",
+  "type": "module",
+  "engines": {
+    "node": ">=22.13"
+  },
+  "scripts": {
+    "dev": "tsx watch --env-file-if-exists=.env src/server.ts",
+    "test": "tsx --test \"src/**/*.test.ts\"",
+    "typecheck": "tsc --noEmit",
+    "eval": "tsx --env-file-if-exists=.env evals/run.ts",
+    "seed": "tsx --env-file-if-exists=.env scripts/seed.ts",
+    "latency": "tsx scripts/latency.ts"
+  },
+  "dependencies": {
+    "@ai-sdk/google": "^4.0.118",
+    "@ai-sdk/groq": "^4.0.81",
+    "@hono/node-server": "^2.1.7",
+    "ai": "^7.0.169",
+    "chrono-node": "^2.10.3",
+    "dompurify": "^3.4.17",
+    "hono": "^4.13.18",
+    "marked": "^18.2.0",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
+  }
+}
